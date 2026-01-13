@@ -238,6 +238,7 @@ private:
   std::unordered_map<std::string, std::shared_ptr<RemoteParticipant>>
       remote_participants_;
   ConnectionState connection_state_ = ConnectionState::Disconnected;
+  int listener_id_{-1};  // FFI event listener ID, must be removed on destruction
   // Data stream
   std::unordered_map<std::string, TextStreamHandler> text_stream_handlers_;
   std::unordered_map<std::string, ByteStreamHandler> byte_stream_handlers_;

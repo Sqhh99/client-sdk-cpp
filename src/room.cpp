@@ -66,8 +66,13 @@ createRemoteParticipant(const proto::OwnedParticipant &owned) {
 
 } // namespace
 Room::Room() {}
-
-Room::~Room() {}
+Room::~Room() {
+  // Remove FFI event listener to prevent use-after-free
+  if (listener_id_ >= 0) {
+    FfiClient::instance().RemoveListener(listener_id_);
+    listener_id_ = -1;
+  }
+}
 
 void Room::setDelegate(RoomDelegate *delegate) {
   std::lock_guard<std::mutex> g(lock_);
@@ -84,6 +89,8 @@ bool Room::Connect(const std::string &url, const std::string &token,
       FfiClient::instance().RemoveListener(listenerId);
       throw std::runtime_error("already connected");
     }
+    // Store listener ID for cleanup in destructor
+    listener_id_ = listenerId;
   }
   auto fut = FfiClient::instance().connectAsync(url, token, options);
   try {
