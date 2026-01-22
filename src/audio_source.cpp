@@ -39,7 +39,8 @@ static double now_seconds() {
 // AudioSource
 // ============================================================================
 
-AudioSource::AudioSource(int sample_rate, int num_channels, int queue_size_ms)
+AudioSource::AudioSource(int sample_rate, int num_channels, int queue_size_ms,
+                         const AudioSourceOptions &options)
     : sample_rate_(sample_rate), num_channels_(num_channels),
       queue_size_ms_(queue_size_ms) {
   proto::FfiRequest req;
@@ -48,6 +49,11 @@ AudioSource::AudioSource(int sample_rate, int num_channels, int queue_size_ms)
   msg->set_sample_rate(static_cast<std::uint32_t>(sample_rate_));
   msg->set_num_channels(static_cast<std::uint32_t>(num_channels_));
   msg->set_queue_size_ms(static_cast<std::uint32_t>(queue_size_ms_));
+
+  auto *opts = msg->mutable_options();
+  opts->set_echo_cancellation(options.echo_cancellation);
+  opts->set_noise_suppression(options.noise_suppression);
+  opts->set_auto_gain_control(options.auto_gain_control);
 
   proto::FfiResponse resp = FfiClient::instance().sendRequest(req);
 

@@ -31,6 +31,15 @@ class FfiResponse;
 class FfiClient;
 
 /**
+ * Options for configuring audio processing on an AudioSource.
+ */
+struct AudioSourceOptions {
+  bool echo_cancellation = false;
+  bool noise_suppression = false;
+  bool auto_gain_control = false;
+};
+
+/**
  * Represents a real-time audio source with an internal audio queue.
  */
 class AudioSource {
@@ -41,8 +50,10 @@ public:
    * @param sample_rate   Sample rate in Hz.
    * @param num_channels  Number of channels.
    * @param queue_size_ms Max buffer duration for the internal queue in ms.
+   * @param options       Audio processing options (echo cancellation, etc.).
    */
-  AudioSource(int sample_rate, int num_channels, int queue_size_ms = 1000);
+  AudioSource(int sample_rate, int num_channels, int queue_size_ms = 1000,
+              const AudioSourceOptions &options = {});
   virtual ~AudioSource() = default;
 
   AudioSource(const AudioSource &) = delete;
